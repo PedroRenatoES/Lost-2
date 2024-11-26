@@ -14,9 +14,35 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Objetos Perdidos',
+      title: 'Objetos 2',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: const Color(0xFFA50050),
+        scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+        appBarTheme: const AppBarTheme(
+          color: Color(0xFFA50050),
+          iconTheme: IconThemeData(color: Colors.white),
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFA50050),
+            foregroundColor: Colors.white,
+          ),
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          selectedItemColor: Color(0xFFA50050),
+          unselectedItemColor: Colors.grey,
+          backgroundColor: Colors.white,
+        ),
+        cardTheme: const CardTheme(
+          color: Colors.white,
+          margin: EdgeInsets.all(10),
+          elevation: 3,
+        ),
       ),
       home: const LoginScreen(), // Inicia con LoginScreen
     );
@@ -36,7 +62,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isLoading = false; // Para mostrar un indicador de carga
   bool isLogin = true; // Determina si estamos en login o registro
 
-  // Función para manejar el login
   Future<void> handleLogin() async {
     setState(() {
       isLoading = true;
@@ -53,23 +78,18 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    // Llamar al método loginUser
     final result = await loginUser(email, password);
 
     if (result['success']) {
-      // Guardar el token en SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', result['token']);
-
-      // Guardar la información del usuario
       final user = result['user'];
       await prefs.setString('user_name', user['username']);
       await prefs.setString('user_email', user['email']);
       await prefs.setString('user_phone', user['phone']);
       await prefs.setString('user_type', user['userType']);
-      await prefs.setString('user_id', user['userId']); // Guardamos el userId
+      await prefs.setString('user_id', user['userId']);
 
-      // Redirigir a la página principal
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -83,7 +103,6 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  // Mostrar un diálogo de error
   void _showError(String message) {
     showDialog(
       context: context,
@@ -106,74 +125,82 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                isLogin ? 'Iniciar Sesión' : 'Registro',
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 40),
-              TextField(
-                controller: emailController, // Asignar controlador
-                decoration: InputDecoration(
-                  labelText: 'Correo electrónico',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  isLogin ? 'Iniciar Sesión' : 'Registro',
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFA50050),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: passwordController, // Asignar controlador
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Contraseña',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              isLoading
-                  ? const CircularProgressIndicator() // Mostrar indicador de carga
-                  : ElevatedButton(
-                      onPressed: handleLogin, // Llamar al login
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(isLogin ? 'Iniciar Sesión' : 'Registrarse'),
+                const SizedBox(height: 40),
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Correo electrónico',
+                    labelStyle: const TextStyle(color: Color(0xFFA50050)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () {
-                  // Cambiar la vista al registrar o login
-                  if (isLogin) {
-                    // Si estamos en Login, navegar a RegisterScreen
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const RegisterScreen()),
-                    );
-                  } else {
-                    setState(() {
-                      isLogin = !isLogin;
-                    });
-                  }
-                },
-                child: Text(
-                  isLogin
-                      ? '¿No tienes cuenta? Regístrate'
-                      : '¿Ya tienes cuenta? Inicia sesión',
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Contraseña',
+                    labelStyle: const TextStyle(color: Color(0xFFA50050)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                isLoading
+                    ? const CircularProgressIndicator(
+                        color: Color(0xFFA50050),
+                      )
+                    : ElevatedButton(
+                        onPressed: handleLogin,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFA50050),
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size.fromHeight(50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(isLogin ? 'Iniciar Sesión' : 'Registrarse'),
+                      ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () {
+                    if (isLogin) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const RegisterScreen()),
+                      );
+                    } else {
+                      setState(() {
+                        isLogin = !isLogin;
+                      });
+                    }
+                  },
+                  child: Text(
+                    isLogin
+                        ? '¿No tienes cuenta? Regístrate'
+                        : '¿Ya tienes cuenta? Inicia sesión',
+                    style: const TextStyle(color: Color(0xFFA50050)),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

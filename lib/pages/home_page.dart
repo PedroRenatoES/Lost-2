@@ -19,12 +19,12 @@ class LostAndFoundApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Objetos Perdidos',
+      title: 'Objetos Perdidos3',
       theme: ThemeData(
-        primaryColor: const Color(0xFFA50050), // Color principal (rojo vino)
-        scaffoldBackgroundColor: const Color(0xFFF5F5F5), // Fondo claro
+        primaryColor: const Color(0xFFA50050),
+        scaffoldBackgroundColor: const Color(0xFFF5F5F5),
         appBarTheme: const AppBarTheme(
-          color: Color(0xFFA50050), // AppBar color
+          color: Color(0xFFA50050),
           iconTheme: IconThemeData(color: Colors.white),
           titleTextStyle: TextStyle(
             color: Colors.white,
@@ -34,17 +34,17 @@ class LostAndFoundApp extends StatelessWidget {
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFA50050), // Botón principal
-            foregroundColor: Colors.white, // Texto del botón
+            backgroundColor: const Color(0xFFA50050),
+            foregroundColor: Colors.white,
           ),
         ),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          selectedItemColor: Color(0xFFA50050), // Icono seleccionado
-          unselectedItemColor: Colors.grey, // Icono no seleccionado
-          backgroundColor: Colors.white, // Fondo del BottomNavigationBar
+          selectedItemColor: Color(0xFFA50050),
+          unselectedItemColor: Colors.grey,
+          backgroundColor: Colors.white,
         ),
         cardTheme: const CardTheme(
-          color: Colors.white, // Fondo de las tarjetas
+          color: Colors.white,
           margin: EdgeInsets.all(10),
           elevation: 3,
         ),
@@ -78,6 +78,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onItemTapped(int index) {
+    if (_selectedIndex == index) return; // Evitar recargar la pantalla actual
+
     setState(() {
       _selectedIndex = index;
     });
@@ -110,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Objetos Perdidos'),
+        title: const Text('Objetos Perdidos5'),
       ),
       body: RefreshIndicator(
         onRefresh: _refreshPosts,
@@ -122,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text('No hay publicaciones'));
+              return const Center(child: Text('No hay publicaciones disponibles.'));
             }
 
             final posts = snapshot.data!;
@@ -139,21 +141,21 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: const <BottomNavigationBarItem>[
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Inicio',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
-            label: 'Crear publicación',
+            label: 'Crear',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.list),
             label: 'Mis Publicaciones',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
+            icon: Icon(Icons.person),
             label: 'Perfil',
           ),
         ],
@@ -169,64 +171,70 @@ class PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Uint8List? bytes;
-    bool showDefaultImage = false;
+    Uint8List? imageBytes;
+    bool useDefaultImage = false;
 
     try {
       if (post.lostItem.image.isNotEmpty) {
-        bytes = base64Decode(post.lostItem.image);
+        imageBytes = base64Decode(post.lostItem.image);
       } else {
-        showDefaultImage = true;
+        useDefaultImage = true;
       }
     } catch (e) {
-      showDefaultImage = true;
-      print('Error al decodificar la imagen: $e');
+      useDefaultImage = true;
     }
 
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              post.lostItem.name,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 5,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (useDefaultImage)
+            Image.asset(
+              'assets/images/skibidihomero.png',
+              height: 200,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            )
+          else if (imageBytes != null)
+            Image.memory(
+              imageBytes,
+              height: 200,
+              width: double.infinity,
+              fit: BoxFit.cover,
             ),
-            const SizedBox(height: 5),
-            Text('Descripción: ${post.lostItem.description}'),
-            const SizedBox(height: 5),
-            if (showDefaultImage)
-              Image.asset(
-                'assets/images/skibidihomero.png',
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              )
-            else if (bytes != null)
-              Image.memory(
-                bytes,
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CreateCommentScreen(postId: post.id),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  post.lostItem.name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                );
-              },
-              child: const Text('Comentar'),
+                ),
+                const SizedBox(height: 5),
+                Text('Descripción: ${post.lostItem.description}'),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            CreateCommentScreen(postId: post.id),
+                      ),
+                    );
+                  },
+                  child: const Text('Comentar'),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
